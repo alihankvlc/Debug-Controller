@@ -1,15 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Serialization;
-
 namespace _Project.Common
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using UnityEngine.Serialization;
+
     public sealed class ConsoleController : MonoBehaviour
     {
+        #region Variables
+
         [SerializeField] private KeyCode _toggleEnableKey;
         private bool _enableConsoleWindow;
         private bool _enableDebugMode;
@@ -27,6 +29,10 @@ namespace _Project.Common
 
         private Rect _windowRect;
 
+        #endregion
+
+        #region Fonksiyonlar...
+
         private void Awake()
         {
             _activeDebugging = new Command("/debug", "", () => { _enableDebugMode = !_enableDebugMode; });
@@ -36,6 +42,9 @@ namespace _Project.Common
                 _activeDebugging,
             };
         }
+
+        private void OnEnable() =>
+            Application.logMessageReceived += HandleLog;
 
         private void Start()
         {
@@ -51,13 +60,10 @@ namespace _Project.Common
         private void Update()
         {
             if (Input.GetKeyDown(_toggleEnableKey))
-            {
                 _enableConsoleWindow = !_enableConsoleWindow;
-            }
         }
 
-        private void OnEnable() => Application.logMessageReceived += HandleLog;
-        private void OnDisable() => Application.logMessageReceived -= HandleLog;
+        #region GUI
 
         private void OnGUI()
         {
@@ -87,12 +93,14 @@ namespace _Project.Common
                 }
             }
             else if (GUILayout.Button("Close", GUILayout.Width(80), GUILayout.Height(20)))
-            {
                 _enableConsoleWindow = false;
-            }
 
             GUILayout.EndHorizontal();
         }
+
+        #endregion
+
+        #region Komut Gönderme...
 
         private void HandleLog(string logString, string stackTrace, LogType type)
         {
@@ -138,6 +146,10 @@ namespace _Project.Common
                 command.Use();
         }
 
+        #endregion
+
+        #region Log Oluşturma...
+
         private void CreateLogFile(string content)
         {
             try
@@ -162,5 +174,12 @@ namespace _Project.Common
             string filePath = Path.Combine(Application.dataPath, "game_log");
             return File.Exists(_filePath);
         }
+
+        #endregion
+
+        private void OnDisable() =>
+            Application.logMessageReceived -= HandleLog;
+
+        #endregion
     }
 }
