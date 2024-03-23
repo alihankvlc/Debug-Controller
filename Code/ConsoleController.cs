@@ -73,6 +73,12 @@ namespace _Project.Common
                 return;
             }
 
+            if (_enableDebugMode)
+            {
+                int fps = Mathf.RoundToInt(1f / Time.deltaTime);
+                GUI.Label(new Rect(10, 10, 100, 20), "FPS: " + fps);
+            }
+
             _windowRect = GUILayout.Window(0, _windowRect, DebugWindow, "Console");
         }
 
